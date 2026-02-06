@@ -361,10 +361,28 @@
             } 
         });
 
-        yesBtn.addEventListener("click", () => {
-            askCard.classList.add("hidden");
-            yayCard.classList.remove("hidden");
-            startConfetti();
+        // YES button: on each click show the next cute message; after
+        // the last message, proceed to the yay screen.
+        let yesClickIndex = 0;
+        yesBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (yesClickIndex < cuteYesTexts.length) {
+                yesBtn.textContent = cuteYesTexts[yesClickIndex];
+                yesClickIndex++;
+
+                if (yesClickIndex >= cuteYesTexts.length) {
+                    // last message shown — reveal the yay view
+                    askCard.classList.add("hidden");
+                    yayCard.classList.remove("hidden");
+                    startConfetti();
+                }
+            } else {
+                // fallback: ensure yay view is shown
+                askCard.classList.add("hidden");
+                yayCard.classList.remove("hidden");
+                startConfetti();
+            }
         });
 
         const funnyNoTexts = [
@@ -381,6 +399,17 @@
             "Please no 🥺",
         ];
         let lastNoTextIndex = -1;
+        let resetTimerNo = null;
+
+        const cuteYesTexts = [
+            "Yes — my heart is all yours 💕",
+            "A million times yes, and then some 😍",
+            "Absolutely — you make me complete 💖",
+            "Yes! Take my hand, forever and always 💘",
+            "Yes — I choose you, every day 💞",
+            "Yes! You brighten my world 💓",
+            "Yes, and I'll love you more each day 😘",
+        ];
 
         function setFunnyNoText() {
 
@@ -391,11 +420,26 @@
             noBtn.textContent = funnyNoTexts[idx];
 
             // optional: reset back to "NO" after a bit
-            clearTimeout(resetTimer);
-            resetTimer = setTimeout(() => {
+            clearTimeout(resetTimerNo);
+            resetTimerNo = setTimeout(() => {
                 if (!evasionStarted) noBtn.textContent = "NO";
             }, 1200);
 
+        }
+
+        function setCuteYesText() {
+            let idx = Math.floor(Math.random() * cuteYesTexts.length);
+            if (idx === lastYesTextIndex) idx = (idx + 1) % cuteYesTexts.length;
+            lastYesTextIndex = idx;
+
+            yesBtn.textContent = cuteYesTexts[idx];
+
+            clearTimeout(resetTimerYes);
+            resetTimerYes = setTimeout(() => {
+                yesBtn.textContent = "YES";
+            }, 1200);
+
+            return true;
         }
         function isMobileLike() {
             // “coarse pointer” ~= touch-first devices (phones/tablets)
